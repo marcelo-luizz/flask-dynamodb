@@ -1,0 +1,38 @@
+name: "Docker push and deploy app on Google Cloud Run"
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+jobs:
+  build:
+    name: Setup Gcloud Account and Deploy the application on google cloud
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: gcr.io/${{ secrets.PROJECT_ID }}/serd-frontend
+
+    steps:
+    - name: Print image tag
+      run: echo $GITHUB_RUN_ID
+      
+    - name: Login To GCP
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        project_id: ${{ secrets.PROJECT_ID }}
+        service_account_email: ${{ secrets.GCP_EMAIL }}
+        service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+
+    - name: Configure Docker
+      run: gcloud auth configure-docker --quiet
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # - name: Replace Var Content
+    #   run: sed -i -e "s,DEPLOY_SERD_BACKEND,https://api-serd.ucam-campos.br,g" ./src/environments/environment.prod.ts
+      
+    - name: Build Docker image
+      run: docker build . -t $IMAGE_NAME:$GITHUB_RUN_ID
+
+    - name: Push Docker image
+      run: docker push $IMAGE_NAME:$GITHUB_RUN_ID
