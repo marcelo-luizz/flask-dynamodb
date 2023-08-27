@@ -1,4 +1,4 @@
-name: Deploy to EC2 Hml
+name: Migrate Dev
 on:
   # schedule:
   #   - cron: '00 22 * * 1-5'
@@ -22,17 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-  
-    - name: Checkout
-      id: checkout
-      uses: actions/checkout@v2
-      
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-
     - name: Configure AWS credentials
       id: aws-credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -41,24 +30,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-      
-    - name: Build and push Docker image
-      env:
-        IMAGE_TAG: latest
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: Dockerfile
-        platforms: linux/arm64
-        push: true
-        tags: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
-        build-args: |
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-        cache-from: | 
-          type=gha
-        cache-to: | 
-          type=gha,mode=max  
- 
+
+    - name: Session Manager
+      id: ssm-into-ec2
+      run: |-
+        aws ssm send-command \
+          --document-name "AWS-RunShellScript" \
+          --targets Key=tag:aws:autoscaling:groupName,Values=$INSTANCE_TAG \
+          --parameters commands=["docker exec container_name sh -c 'touch teste-file.txt' "] 
+   
