@@ -37,5 +37,6 @@ jobs:
         aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --targets Key=tag:aws:autoscaling:groupName,Values=$INSTANCE_TAG \
-          --parameters commands=["sudo docker exec container_name sh -c `touch /var/log/tteste-file.txt`"] 
+          --parameters commands=["sudo su", "docker exec container_name sh -c `touch /var/log/teste-file.txt`"] 
    
+# docker exec container_name sh -c 'touch /var/log/teste-file.txt'
