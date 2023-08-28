@@ -40,7 +40,8 @@ jobs:
           --targets Key=tag:aws:autoscaling:groupName,Values=$INSTANCE_TAG \
           --parameters commands=["docker exec container_name sh -c `ls -lha`"]
           
-          # ["docker exec container_name sh -c `touch /var/log/teste-file.txt`"] 
+      
    
 # docker exec container_name sh -c 'touch /var/log/teste-file.txt'
 # echo `128596` | su -c "docker exec container_name sh -c `touch /var/log/teste-file.txt`" $USER
+# ["docker exec container_name sh -c `touch /var/log/teste-file.txt`"] 
