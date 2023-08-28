@@ -34,9 +34,11 @@ jobs:
     - name: Session Manager
       id: ssm-into-ec2
       run: |-
+        sudo usermod -aG docker $USER
+        exec su -l $USER
         aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --targets Key=tag:aws:autoscaling:groupName,Values=$INSTANCE_TAG \
-          --parameters commands=["echo `128596` | su -c docker exec container_name sh -c `touch /var/log/teste-file2.txt` marcelo"] 
+          --parameters commands=["docker exec container_name sh -c `touch /var/log/teste-file.txt`"] 
    
 # docker exec container_name sh -c 'touch /var/log/teste-file.txt'
