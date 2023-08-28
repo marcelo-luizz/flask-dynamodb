@@ -38,7 +38,7 @@ jobs:
         aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --targets Key=tag:aws:autoscaling:groupName,Values=$INSTANCE_TAG \
-          --parameters commands=["docker exec container_name sh -c `ls -lha`"]
+          --parameters commands=["docker exec container_name sh -c `ls -lha /var/log`"]
           
       
    
